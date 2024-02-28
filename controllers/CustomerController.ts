@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Customer } from "../models";
 import { GeneratePassword, GenerateSalt, ValidatePassowrd } from "../utility";
-import { SignupValidation } from "../utility/FieldValidationUtility";
+import { SignupValidation, LoginValidation } from "../utility/FieldValidationUtility";
 import { GenerateTokens, VerifyRefreshToken } from "../utility/TokenUtility";
 import jwt from "jsonwebtoken";
 import * as dotenv from 'dotenv'
@@ -61,10 +61,8 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
 }
 
 export const Verify = async (req: Request, res: Response, next: NextFunction) => {
-
     const {otp} = req.body
     const customer = req.customer
-
     if (customer) {
         const profile = await Customer.findById(customer._id)
         if (profile) {
@@ -94,8 +92,15 @@ export const Logout = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 export const Login = async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
+    const { error } = LoginValidation(req) 
+    if (error) {
+        return res.status(400).json({
+            'error': true,
+            'response': error.details[0].message
+        })
+    }
     try {
+        const { email, password } = req.body;
         const customer = await Customer.findOne({email: email})
         if (customer) {
             const validated = await ValidatePassowrd(customer.password, password, customer?.salt)
