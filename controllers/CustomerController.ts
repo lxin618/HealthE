@@ -60,6 +60,20 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
     }
 }
 
+export const ResendOtp = async (req: Request, res: Response, next: NextFunction) => {
+
+    const customer = req.customer
+    if (customer) {
+        const profile = await Customer.findById(customer._id)
+        if (profile) {
+            const {otp, expiry} = GenerateOtp()
+            await onRequestOtp(otp, profile.phone.toString())
+            return res.status(200).json()
+        }
+    }
+    return res.status(400).json()
+}
+
 export const Verify = async (req: Request, res: Response, next: NextFunction) => {
     const {otp} = req.body
     const customer = req.customer
