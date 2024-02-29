@@ -1,10 +1,8 @@
 import type { Request, Response, NextFunction } from "express"
 import jwt from 'jsonwebtoken'
-import * as dotenv from 'dotenv';
 import { AccessTokenPayload } from "../utility/TokenUtility";
+import { ACCESS_TOKEN_KEY } from '../config/index'
 
-dotenv.config();
-const ACCESS_TOKEN_KEY = process.env.ACCESS_TOKEN_KEY as string;
 declare global {
     namespace Express {
         export interface Request {

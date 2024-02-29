@@ -4,12 +4,9 @@ import { GeneratePassword, GenerateSalt, ValidatePassowrd } from "../utility";
 import { SignupValidation, LoginValidation } from "../utility/FieldValidationUtility";
 import { GenerateTokens, VerifyRefreshToken } from "../utility/TokenUtility";
 import jwt from "jsonwebtoken";
-import * as dotenv from 'dotenv'
 import { CustomerToken } from "../models/CustomerTokenModel";
 import { GenerateOtp, onRequestOtp } from "../utility/NotificationUtility";
-
-dotenv.config();
-const ACCESS_KEY = process.env.ACCESS_TOKEN_KEY as string
+import { ACCESS_TOKEN_KEY } from '../config'
 
 export const Register = async (req: Request, res: Response, next: NextFunction) => {
     const { error } = SignupValidation(req) 
@@ -175,7 +172,7 @@ export const TokenRefresh = async (req: Request, res: Response, next: NextFuncti
     try {
         const response = await VerifyRefreshToken(refreshToken)
         const payload = {_id: response._id as string, email: response.email}
-        const accessToken = jwt.sign(payload, ACCESS_KEY, {expiresIn: '10d'})
+        const accessToken = jwt.sign(payload, ACCESS_TOKEN_KEY, {expiresIn: '10d'})
         return res.json({
             'error': false,
             'response': accessToken

@@ -1,9 +1,5 @@
 import twilio from 'twilio'
-import * as dotenv from 'dotenv'
-
-dotenv.config();
-const TWILIO_ACCOUNT_SID = process.env.ACCESS_TOKEN_KEY as string
-const TWILIO_AUTH = process.env.ACCESS_TOKEN_KEY as string
+import { TWILIO_ACCOUNT_SID, TWILIO_AUTH } from '../config'
 
 export const GenerateOtp = () => {
     const otp = Math.floor(100000 + Math.random() * 900000)

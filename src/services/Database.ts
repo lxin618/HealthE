@@ -1,12 +1,9 @@
 import mongoose, { ConnectOptions } from 'mongoose';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
-const MONGO_URI = process.env.DATABASE_URL as string;
+import { DATABASE_URL } from '../config'
 
 const dbConnection = async () => {
     try {
-        await mongoose.connect(MONGO_URI)
+        await mongoose.connect(DATABASE_URL)
         console.log('MangoDB has started')
     } catch (err) {
         console.log(err);
