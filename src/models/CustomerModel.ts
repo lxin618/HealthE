@@ -19,6 +19,7 @@ export interface CustomerDoc extends Document {
     diabetes: boolean | null
     chronic: string
     verified: boolean
+    accountSetUp: boolean
     otp: number
     optExpiry: Date
     ethnicity: string
@@ -45,6 +46,7 @@ const CustomerSchema = new Schema({
     overweight: {type: Boolean, default: null},
     highBloodPressure: {type: Boolean, default: null},
     smoker: {type: Boolean, default: null},
+    accountSetUp: {type: Boolean, default: false},
     alcohol: {type: Boolean, default: null},
     highCholesterol: {type: Boolean, default: null},
     diabetes: {type: Boolean, default: null},
