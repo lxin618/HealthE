@@ -35,7 +35,7 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
             salt: salt,
             gender: gender,
             otp: otp,
-            opt_expiry: expiry,
+            optExpiry: expiry,
             verified: false,
         })
         const { accessToken, refreshToken } = await GenerateTokens(customer)
@@ -77,7 +77,7 @@ export const Verify = async (req: Request, res: Response, next: NextFunction) =>
     if (customer) {
         const profile = await Customer.findById(customer._id)
         if (profile) {
-            if (profile.otp == parseInt(otp) && profile.opt_expiry <= new Date()) {
+            if (profile.otp == parseInt(otp) && profile.optExpiry <= new Date()) {
                 profile.verified = true
                 await profile.save()
                 return res.json({
@@ -198,5 +198,8 @@ export const GetCustomerProfile = async (req: Request, res: Response, next: Next
 }
 
 export const UpdateCustomerProfile = async (req: Request, res: Response, next: NextFunction) => {
-    
+    const customer = req.customer
+    if (!customer) {
+        return res.status(404).json('Can\'t locate the customer')
+    }
 }
