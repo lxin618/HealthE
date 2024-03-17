@@ -56,10 +56,11 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
 export const SendOtp = async (req: Request, res: Response, next: NextFunction) => {
     const { phone } = req.body
     if (phone) {
-        // const {otp, expiry} = GenerateOtp()
-        // await onRequestOtp(otp, phone)
+        const {otp, expiry} = GenerateOtp()
+        await onRequestOtp(otp, phone)
         return res.status(200).json({
-            otp: 1234,
+            otp,
+            expiry
         })
     }
     return res.status(400).json({
