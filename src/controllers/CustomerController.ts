@@ -54,10 +54,22 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
 }
 
 export const SendOtp = async (req: Request, res: Response, next: NextFunction) => {
-    const { phone } = req.body
-    if (phone) {
+    const { value, type } = req.body
+    if (type == 'phone') {
         const {otp, expiry} = GenerateOtp()
-        await onRequestOtp(otp, phone)
+        await onRequestOtp(otp, value)
+        return res.status(200).json({
+            otp,
+            expiry
+        })
+    }
+    // email
+    else if (type == 'email') {
+        const {otp, expiry} = GenerateOtp()
+
+        // to do - email uses different logic to send
+        // prob sendGrid? atm, return code from console for local dev
+
         return res.status(200).json({
             otp,
             expiry
