@@ -4,13 +4,13 @@ export interface CustomerDoc extends Document {
     _id: string
     firstName: string
     lastName: string
-    email: string
+    email: string | null
     password: string
     salt: string
     gender: string
     socialSignin: string
     age: number
-    phone: number
+    phone: number | null
     height: number
     weight: number
     overweight: boolean | null
@@ -30,14 +30,14 @@ export interface CustomerDoc extends Document {
 const CustomerSchema = new Schema({
     firstName: {type: String, require: true, trim: true},
     lastName: {type: String, require: true, trim: true},
-    email: {type: String, require: true, unique: true, trim: true},
+    email: {type: String, unique: true, trim: true, index: true, sparse: true},
     password: {type: String, require: true},
     salt: {type: String, require: true},
     gender: {type: String},
     socialSignin: {type: String},
-    age: {type: Number, unique: true},
+    age: {type: Number, default: null},
     ethnicity: {type: String},
-    phone: {type: Number},
+    phone: {type: Number, unique: true, trim: true, index: true, sparse: true},
     profileImage: {type: String},
     height: {type: Number},
     weight: {type: Number},

@@ -246,6 +246,8 @@ export const GooglePostLogin = async (req: Request, res: Response, next: NextFun
         }
     }
     catch(e) {
+    console.log(e)
+
         return res.status(400).json('Error saving customer profile, please try again later')
     }
 
