@@ -26,7 +26,6 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
     }
     const salt = await GenerateSalt()
     const hashPassword = await GeneratePassword(password, salt)
-    const { otp, expiry } = GenerateOtp()
     try {
         const customer = await Customer.create({
             name: name,
@@ -34,12 +33,8 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
             password: hashPassword,
             salt: salt,
             gender: gender,
-            otp: otp,
-            optExpiry: expiry,
-            verified: false,
         })
         const { accessToken, refreshToken } = await GenerateTokens(customer)
-
         return res.json({
             'error': false,
             'response': {customer, accessToken, refreshToken}
@@ -57,7 +52,7 @@ export const SendOtp = async (req: Request, res: Response, next: NextFunction) =
     const { value, type } = req.body
     if (type == 'phone') {
         const {otp, expiry} = GenerateOtp()
-        await onRequestOtp(otp, value)
+        // await onRequestOtp(otp, value)
         return res.status(200).json({
             otp,
             expiry
@@ -80,27 +75,27 @@ export const SendOtp = async (req: Request, res: Response, next: NextFunction) =
     })
 }
 
-export const Verify = async (req: Request, res: Response, next: NextFunction) => {
-    const {otp} = req.body
-    const customer = req.customer
-    if (customer) {
-        const profile = await Customer.findById(customer._id)
-        if (profile) {
-            if (profile.otp == parseInt(otp) && profile.optExpiry <= new Date()) {
-                profile.verified = true
-                await profile.save()
-                return res.json({
-                    'error': false,
-                    'response': 'verified'
-                })
-            }
-        }
-    }
-    return res.json({
-        'error': true,
-        'response': 'verification code doesn\'t match'
-    })
-}
+// export const Verify = async (req: Request, res: Response, next: NextFunction) => {
+//     const {otp} = req.body
+//     const customer = req.customer
+//     if (customer) {
+//         const profile = await Customer.findById(customer._id)
+//         if (profile) {
+//             if (profile.otp == parseInt(otp) && profile.optExpiry <= new Date()) {
+//                 profile.verified = true
+//                 await profile.save()
+//                 return res.json({
+//                     'error': false,
+//                     'response': 'verified'
+//                 })
+//             }
+//         }
+//     }
+//     return res.json({
+//         'error': true,
+//         'response': 'verification code doesn\'t match'
+//     })
+// }
 
 export const Logout = async (req: Request, res: Response, next: NextFunction) => {
     const { refreshToken } = req.body
@@ -218,4 +213,40 @@ export const UpdateCustomerProfile = async (req: Request, res: Response, next: N
     catch(e) {
 
     }
+}
+
+export const GooglePostLogin = async (req: Request, res: Response, next: NextFunction) => {
+    const { email, firstName, lastName, photoURL, phoneNumber } = req.body
+
+    if (!email) {
+        return res.status(404).json('Error fetching email address, please try again later')
+    }
+
+    try {
+        // save/update customer profile
+        const customer = await Customer.findOneAndUpdate({ email: email }, {
+            firstName,
+            lastName,
+            profileImage: photoURL,
+            phone: phoneNumber,
+            socialSignin: 'google'
+        }, { 
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true
+        });
+
+        // once profile is saved, issue an app token
+        if (customer) {
+            const { accessToken, refreshToken } = await GenerateTokens(customer)
+                return res.json({customer,accessToken,refreshToken})
+        }
+        else {
+            return res.status(404).json('Error saving customer profile, please try again later')
+        }
+    }
+    catch(e) {
+        return res.status(400).json('Error saving customer profile, please try again later')
+    }
+
 }

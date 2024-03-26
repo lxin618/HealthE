@@ -2,11 +2,13 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface CustomerDoc extends Document {
     _id: string
-    name: string
+    firstName: string
+    lastName: string
     email: string
     password: string
     salt: string
     gender: string
+    socialSignin: string
     age: number
     phone: number
     height: number
@@ -18,10 +20,7 @@ export interface CustomerDoc extends Document {
     highCholesterol: boolean | null
     diabetes: boolean | null
     chronic: string
-    verified: boolean
     accountSetUp: boolean
-    otp: number
-    optExpiry: Date
     ethnicity: string
     profileImage: string
     createdAt: Date
@@ -29,14 +28,13 @@ export interface CustomerDoc extends Document {
 }
 
 const CustomerSchema = new Schema({
-    name: {type: String, require: true, trim: true},
+    firstName: {type: String, require: true, trim: true},
+    lastName: {type: String, require: true, trim: true},
     email: {type: String, require: true, unique: true, trim: true},
     password: {type: String, require: true},
     salt: {type: String, require: true},
-    verified: {type: Boolean, require: true},
-    otp: {type: Number, require: true},
-    optExpiry: {type: Date, require: true},
     gender: {type: String},
+    socialSignin: {type: String},
     age: {type: Number, unique: true},
     ethnicity: {type: String},
     phone: {type: Number},
