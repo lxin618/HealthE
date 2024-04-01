@@ -70,9 +70,7 @@ export const SendOtp = async (req: Request, res: Response, next: NextFunction) =
             expiry
         })
     }
-    return res.status(400).json({
-        'response': 'Please provide a phone number'
-    })
+    return res.status(400).json('Please provide a phone number')
 }
 
 // export const Verify = async (req: Request, res: Response, next: NextFunction) => {
@@ -107,31 +105,39 @@ export const Logout = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 export const Login = async (req: Request, res: Response, next: NextFunction) => {
-    const { error } = LoginValidation(req) 
+    const { error } = LoginValidation(req)
+
     if (error) {
-        return res.status(400).json({
-            'error': true,
-            'response': error.details[0].message
-        })
+        return res.status(400).json(error.details[0].message)
     }
+
     try {
-        const { email, password } = req.body;
-        const customer = await Customer.findOne({email: email})
-        if (customer) {
-            const validated = await ValidatePassowrd(customer.password, password, customer?.salt)
-            if (validated) {
-                const { accessToken, refreshToken } = await GenerateTokens(customer)
-                return res.json({
-                    'error': false,
-                    'response': {customer,accessToken,refreshToken}
-                })
-            }
-            else {
-                return res.status(400).json({
-                    'error': true,
-                    'response': `Incorrect password`
-                })
-            }
+        const { type, value, password } = req.body;
+        let key: string
+        if (type == 'phone') {
+            key = 'phone'
+        }
+        else {
+            key = 'email'
+        }
+        const customer = await Customer.findOne({[key]: value})
+
+        if (!customer) {
+            return res.status(404).json('Can\'t find a customer with the email address or phone number')
+        }
+
+        if (!customer.salt) {
+            return res.status(400).json('There is no password set for this account, please reset your password or use social sign in')
+        }
+
+        const validated = await ValidatePassowrd(customer.password, password, customer?.salt)
+
+        if (validated) {
+            const { accessToken, refreshToken } = await GenerateTokens(customer)
+            return res.json({customer,accessToken,refreshToken})
+        }
+        else {
+            return res.status(400).json(`Incorrect password`)
         }
     }
     catch(e) {
@@ -246,8 +252,6 @@ export const GooglePostLogin = async (req: Request, res: Response, next: NextFun
         }
     }
     catch(e) {
-    console.log(e)
-
         return res.status(400).json('Error saving customer profile, please try again later')
     }
 

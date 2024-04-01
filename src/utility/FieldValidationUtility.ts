@@ -15,7 +15,8 @@ export const SignupValidation = (req: Request) => {
 
 export const LoginValidation = (req: Request) => {
     const schema = Joi.object({
-        email: Joi.string().required().label('Email'),
+        type: Joi.string().required().label(req.body.type),
+        value: Joi.string().required().label('Email'),
         password: passwordComplexity({min:6,max:30}).required().label('Password')
     })
     return schema.validate(req.body)

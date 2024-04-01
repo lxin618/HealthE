@@ -5,6 +5,7 @@ export const GenerateSalt = async () => {
 }
 
 export const GeneratePassword = async (password: string, salt: string) => {
+    if (!salt) return false
     return await bcrypt.hash(password, salt)
 }
 
