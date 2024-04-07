@@ -9,42 +9,31 @@ import { GenerateOtp, onRequestOtp } from "../utility/NotificationUtility";
 import { ACCESS_TOKEN_KEY } from '../config'
 
 export const Register = async (req: Request, res: Response, next: NextFunction) => {
-    const { error } = SignupValidation(req) 
+    const { error } = SignupValidation(req)
     if (error) {
-        return res.status(400).json({
-            'error': true,
-            'response': error.details[0].message
-        })
+        return res.status(400).json(error.details[0].message)
     }
-    const { name, email, password, gender } = req.body;
+    const { firstName, lastName, email, password, birthday } = req.body;
     const existingCustomer = await Customer.findOne({email: email})
     if (existingCustomer) {
-        return res.status(500).json({
-            'error': true,
-            'response': 'Email address already existed'
-        })
+        return res.status(500).json('Email address already existed')
     }
     const salt = await GenerateSalt()
     const hashPassword = await GeneratePassword(password, salt)
     try {
         const customer = await Customer.create({
-            name: name,
+            firstName: firstName,
+            lastName: lastName,
             email: email,
             password: hashPassword,
             salt: salt,
-            gender: gender,
+            birthday: new Date(req.body.birthday),
         })
         const { accessToken, refreshToken } = await GenerateTokens(customer)
-        return res.json({
-            'error': false,
-            'response': {customer, accessToken, refreshToken}
-        })
+        return res.json({customer, accessToken, refreshToken})
     }
     catch(e) {
-        return res.status(500).json({
-            'error': true,
-            'response': e
-        })
+        return res.status(500).json(e)
     }
 }
 

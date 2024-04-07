@@ -9,7 +9,7 @@ export interface CustomerDoc extends Document {
     salt: string
     gender: string
     socialSignin: string
-    age: number
+    birthday: Date
     phone: number | null
     height: number
     weight: number
@@ -35,7 +35,7 @@ const CustomerSchema = new Schema({
     salt: {type: String, require: true},
     gender: {type: String},
     socialSignin: {type: String},
-    age: {type: Number, default: null},
+    birthday: {type: Date, default: null},
     ethnicity: {type: String},
     phone: {type: Number, unique: true, trim: true, index: true, sparse: true},
     profileImage: {type: String},
