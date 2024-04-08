@@ -21,13 +21,15 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
     const salt = await GenerateSalt()
     const hashPassword = await GeneratePassword(password, salt)
     try {
+        let dateParts = birthday.split("/");
+        let dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
         const customer = await Customer.create({
             firstName: firstName,
             lastName: lastName,
             email: email,
             password: hashPassword,
             salt: salt,
-            birthday: new Date(req.body.birthday),
+            birthday: dateObject,
         })
         const { accessToken, refreshToken } = await GenerateTokens(customer)
         return res.json({customer, accessToken, refreshToken})
