@@ -1,4 +1,5 @@
 import express from 'express';
+import 'express-async-errors';
 import { connect as _connect } from 'mongoose';
 import * as dotenv from 'dotenv';
 import { CustomerRoute, AuthRoute } from './routes';

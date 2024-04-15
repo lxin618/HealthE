@@ -8,7 +8,7 @@ router.post('/login', Login)
 router.post('/logout', Logout)
 router.post('/google', GooglePostLogin)
 router.post('/register', Register)
-router.post('/refreshtoken', TokenRefresh)
+router.post('/tokenRefresh', TokenRefresh)
 // router.post('/verify', Auth, Verify)
 router.post('/sendOtp', SendOtp)
 

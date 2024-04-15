@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Customer } from "../models";
-import { GeneratePassword, GenerateSalt, ValidatePassowrd } from "../utility";
+import { ValidatePassowrd } from "../utility";
 import { SignupValidation, LoginValidation } from "../utility/FieldValidationUtility";
 import { GenerateTokens, VerifyRefreshToken } from "../utility/TokenUtility";
 import jwt from "jsonwebtoken";
@@ -18,8 +18,6 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
     if (existingCustomer) {
         return res.status(500).json('Email address already existed')
     }
-    const salt = await GenerateSalt()
-    const hashPassword = await GeneratePassword(password, salt)
     try {
         let dateParts = birthday.split("/");
         let dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
@@ -27,8 +25,8 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
             firstName: firstName,
             lastName: lastName,
             email: email,
-            password: hashPassword,
-            salt: salt,
+            // password hashing done inside model
+            password: password,
             birthday: dateObject,
         })
         const { accessToken, refreshToken } = await GenerateTokens(customer)

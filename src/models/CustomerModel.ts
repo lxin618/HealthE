@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { GeneratePassword, GenerateSalt } from "../utility";
 
 export interface CustomerDoc extends Document {
     _id: string
@@ -58,6 +59,16 @@ const CustomerSchema = new Schema({
         }
     },
     timestamps: true
+})
+
+CustomerSchema.pre('save', async function(done) {
+    if (this.isModified('password')) {
+        const salt = await GenerateSalt()
+        const hashPassword = await GeneratePassword(this.get('password'), salt)
+        this.set('password', hashPassword)
+        this.set('salt', salt)
+    }
+    done()
 })
 
 export const Customer = mongoose.model<CustomerDoc>('customer', CustomerSchema)
