@@ -16,7 +16,7 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
     const { firstName, lastName, email, password, birthday } = req.body;
     const existingCustomer = await Customer.findOne({email: email})
     if (existingCustomer) {
-        return res.status(500).json('Email address already existed')
+        return res.status(400).json('Email address already existed')
     }
     try {
         let dateParts = birthday.split("/");
@@ -203,7 +203,7 @@ export const UpdateCustomerProfile = async (req: Request, res: Response, next: N
     }
 
     try {
-        
+        // const {}
     }
     catch(e) {
 

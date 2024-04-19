@@ -7,6 +7,6 @@ const router = express.Router();
 // router.post('/refreshtoken, TokenRefresh')
 router.get('/profile', GetCustomerProfile)
 router.get('/:id', GetCustomerById)
-router.patch('/profile', UpdateCustomerProfile)
+router.patch('/profile', Auth, UpdateCustomerProfile)
 
 export { router as CustomerRoute }

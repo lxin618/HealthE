@@ -13,6 +13,7 @@ declare global {
 
 export const Auth  = (req: Request, res: Response, next: NextFunction) => {
     const token = req.header('Authorization');
+    console.log(token)
     if (!token) {
         return res.json({
             'error': true,

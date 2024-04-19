@@ -20,6 +20,14 @@ const CustomerTokenSchema = new Schema({
         default: Date.now,
         expires: 30*86400
     }
+}, {
+    toJSON: {
+        transform(doc, ret) {
+            ret.id = ret._id
+            delete ret._id
+            delete ret.__v
+        }
+    }
 })
 
 export const CustomerToken = mongoose.model('CustomerToken', CustomerTokenSchema)
