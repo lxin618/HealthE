@@ -9,9 +9,9 @@ var constFormData = {
 }
 // -- SIGN UP -- //
 it('should return 200 status on successful register', async () => {
-    constFormData['email'] = 'test@test.com'
-    constFormData['password'] = 'Password'
-    return request(app).post('/api/auth/register').send(constFormData).expect(200);
+    const { accessToken, refreshToken } = await global.register();
+    expect(accessToken).toBeDefined();
+    expect(refreshToken).toBeDefined();
 });
 
 it('should return 400 status on missing email or password', async () => {
