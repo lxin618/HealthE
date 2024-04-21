@@ -13,7 +13,7 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
     if (error) {
         return res.status(400).json(error.details[0].message)
     }
-    const { firstName, lastName, email, password, birthday } = req.body;
+    const { firstName, lastName, email, password, phone, birthday } = req.body;
     const existingCustomer = await Customer.findOne({email: email})
     if (existingCustomer) {
         return res.status(400).json('Email address already existed')
@@ -25,6 +25,7 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
             firstName: firstName,
             lastName: lastName,
             email: email,
+            phone: phone,
             // password hashing done inside model
             password: password,
             birthday: dateObject,
