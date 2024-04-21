@@ -88,10 +88,7 @@ export const SendOtp = async (req: Request, res: Response, next: NextFunction) =
 export const Logout = async (req: Request, res: Response, next: NextFunction) => {
     const { refreshToken } = req.body
     await CustomerToken.findOneAndDelete({token: refreshToken})
-    return res.json({
-        'error': false,
-        'response': 'User logged out sccessfully'
-    })
+    return res.json('User logged out sccessfully')
 }
 
 export const Login = async (req: Request, res: Response, next: NextFunction) => {
