@@ -2,7 +2,7 @@
   "name": "HealthE",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "jest --no-cache",
     "start": "node dist/index.js",

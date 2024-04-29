@@ -199,7 +199,7 @@ export const UpdateCustomerProfile = async (req: Request, res: Response, next: N
     if (!customer) {
         return res.status(404).json('Can\'t locate the customer')
     }
-
+    return res.json({customer})
     try {
         // const {}
     }

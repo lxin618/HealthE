@@ -15,10 +15,7 @@ export const Auth  = (req: Request, res: Response, next: NextFunction) => {
     const token = req.header('Authorization');
     console.log(token)
     if (!token) {
-        return res.json({
-            'error': true,
-            'response': 'Invalid auth'
-        })
+        return res.status(401).json('Invalid auth')
     }
     try {
         const payload = jwt.verify(token.split(' ')[1], ACCESS_TOKEN_KEY) as AccessTokenPayload
@@ -26,9 +23,6 @@ export const Auth  = (req: Request, res: Response, next: NextFunction) => {
         next()
     }
     catch(e) {
-        return res.json({
-            'error': true,
-            'response': 'Invalid signature'
-        })
+        return res.status(401).json('Invalid token')
     }
 }
