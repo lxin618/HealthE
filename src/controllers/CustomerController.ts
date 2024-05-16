@@ -1,26 +1,27 @@
-import { Request, Response, NextFunction } from "express";
-import { Customer } from "../models";
-import { ValidatePassowrd } from "../utility";
-import { SignupValidation, LoginValidation } from "../utility/FieldValidationUtility";
-import { GenerateTokens, VerifyRefreshToken } from "../utility/TokenUtility";
-import jwt from "jsonwebtoken";
-import { CustomerToken } from "../models/CustomerTokenModel";
-import { GenerateOtp, onRequestOtp } from "../utility/NotificationUtility";
-import { ACCESS_TOKEN_KEY } from '../config'
+import { Request, Response, NextFunction } from 'express';
+import { Customer } from '../models';
+import { ValidatePassowrd } from '../utility';
+import { SignupValidation, LoginValidation } from '../utility/FieldValidationUtility';
+import { GenerateTokens, VerifyRefreshToken } from '../utility/TokenUtility';
+import jwt from 'jsonwebtoken';
+import { CustomerToken } from '../models/CustomerTokenModel';
+import { GenerateOtp, onRequestOtp } from '../utility/NotificationUtility';
+import { ACCESS_TOKEN_KEY, SENDGRID_API_KEY, EMAIL_OTP_TEMPLATE_ID } from '../config';
+import { MailService } from '@sendgrid/mail';
 
 export const Register = async (req: Request, res: Response, next: NextFunction) => {
-    const { error } = SignupValidation(req)
+    const { error } = SignupValidation(req);
     if (error) {
-        return res.status(400).json(error.details[0].message)
+        return res.status(400).json(error.details[0].message);
     }
     const { firstName, lastName, email, password, phone, birthday } = req.body;
-    const existingCustomer = await Customer.findOne({email: email})
+    const existingCustomer = await Customer.findOne({ email: email });
     if (existingCustomer) {
-        return res.status(400).json('Email address already existed')
+        return res.status(400).json('Email address already existed');
     }
     try {
-        let dateParts = birthday.split("/");
-        let dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]); 
+        let dateParts = birthday.split('/');
+        let dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
         const customer = await Customer.create({
             firstName: firstName,
             lastName: lastName,
@@ -29,39 +30,65 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
             // password hashing done inside model
             password: password,
             birthday: dateObject,
-        })
-        const { accessToken, refreshToken } = await GenerateTokens(customer)
-        return res.json({customer, accessToken, refreshToken})
+        });
+        const { accessToken, refreshToken } = await GenerateTokens(customer);
+        return res.json({ customer, accessToken, refreshToken });
+    } catch (e) {
+        return res.status(500).json(e);
     }
-    catch(e) {
-        return res.status(500).json(e)
-    }
-}
+};
 
 export const SendOtp = async (req: Request, res: Response, next: NextFunction) => {
-    const { value, type } = req.body
+    const { value, type } = req.body;
     if (type == 'phone') {
-        const {otp, expiry} = GenerateOtp()
+        const { otp, expiry } = GenerateOtp();
         // await onRequestOtp(otp, value)
         return res.status(200).json({
             otp,
-            expiry
-        })
+            expiry,
+        });
     }
     // email
     else if (type == 'email') {
-        const {otp, expiry} = GenerateOtp()
-
-        // to do - email uses different logic to send
-        // prob sendGrid? atm, return code from console for local dev
-
-        return res.status(200).json({
-            otp,
-            expiry
-        })
+        const { otp, expiry } = GenerateOtp();
+        const sendgridClient = new MailService();
+        sendgridClient.setApiKey(SENDGRID_API_KEY);
+        const email = {
+            to: value,
+            from: {
+                email: 'lxin618@aucklanduni.ac.nz',
+                name: 'HealthE',
+            },
+            personalizations: [
+                {
+                    to: [
+                        {
+                            email: value,
+                        },
+                    ],
+                    dynamic_template_data: {
+                        code: otp,
+                    },
+                },
+            ],
+            templateId: EMAIL_OTP_TEMPLATE_ID,
+        };
+        sendgridClient
+            .send(email)
+            .then(() => {
+                return res.status(200).json({
+                    otp,
+                    expiry,
+                });
+            })
+            .catch((error) => {
+                return res
+                    .status(500)
+                    .json('Something wrong sending the email, please try again later');
+            });
     }
-    return res.status(400).json('Please provide a phone number')
-}
+    return res.status(400).json('Please provide a phone number');
+};
 
 // export const Verify = async (req: Request, res: Response, next: NextFunction) => {
 //     const {otp} = req.body
@@ -86,160 +113,159 @@ export const SendOtp = async (req: Request, res: Response, next: NextFunction) =
 // }
 
 export const Logout = async (req: Request, res: Response, next: NextFunction) => {
-    const { refreshToken } = req.body
-    await CustomerToken.findOneAndDelete({token: refreshToken})
-    return res.json('User logged out sccessfully')
-}
+    const { refreshToken } = req.body;
+    await CustomerToken.findOneAndDelete({ token: refreshToken });
+    return res.json('User logged out sccessfully');
+};
 
 export const Login = async (req: Request, res: Response, next: NextFunction) => {
-    const { error } = LoginValidation(req)
+    const { error } = LoginValidation(req);
 
     if (error) {
-        return res.status(400).json(error.details[0].message)
+        return res.status(400).json(error.details[0].message);
     }
 
     try {
         const { type, value, password } = req.body;
-        let key: string
+        let key: string;
         if (type == 'phone') {
-            key = 'phone'
+            key = 'phone';
+        } else {
+            key = 'email';
         }
-        else {
-            key = 'email'
-        }
-        const customer = await Customer.findOne({[key]: value})
+        const customer = await Customer.findOne({ [key]: value });
 
         if (!customer) {
-            return res.status(404).json('Can\'t find a customer with the email address or phone number')
+            return res
+                .status(404)
+                .json("Can't find a customer with the email address or phone number");
         }
 
         if (!customer.salt) {
-            return res.status(400).json('There is no password set for this account, please reset your password or use social sign in')
+            return res
+                .status(400)
+                .json(
+                    'There is no password set for this account, please reset your password or use social sign in'
+                );
         }
 
-        const validated = await ValidatePassowrd(customer.password, password, customer?.salt)
+        const validated = await ValidatePassowrd(customer.password, password, customer?.salt);
 
         if (validated) {
-            const { accessToken, refreshToken } = await GenerateTokens(customer)
-            return res.json({customer,accessToken,refreshToken})
+            const { accessToken, refreshToken } = await GenerateTokens(customer);
+            return res.json({ customer, accessToken, refreshToken });
+        } else {
+            return res.status(400).json(`Incorrect password`);
         }
-        else {
-            return res.status(400).json(`Incorrect password`)
-        }
-    }
-    catch(e) {
+    } catch (e) {
         return res.status(404).json({
-            'error': true,
-            'response': `Can't find a customer with the email address - ${e}`
-        })
+            error: true,
+            response: `Can't find a customer with the email address - ${e}`,
+        });
     }
-}
+};
 
 export const GetCustomerById = async (req: Request, res: Response, next: NextFunction) => {
-    const customerId = req.params.id
+    const customerId = req.params.id;
     if (!customerId) {
         return res.status(400).json({
-            'error': true,
-            'response': 'Please provide a customer id'
-        })
+            error: true,
+            response: 'Please provide a customer id',
+        });
     }
     try {
         const customer = await Customer.findById(customerId);
         return res.json({
-            'error': false,
-            'response': customer
-        })
-    }
-    catch(e) {
+            error: false,
+            response: customer,
+        });
+    } catch (e) {
         return res.status(404).json({
-            'error': true,
-            'response': `Customer with id ${customerId} can not be found - ${e}`
-        })
+            error: true,
+            response: `Customer with id ${customerId} can not be found - ${e}`,
+        });
     }
-}
+};
 
 export const TokenRefresh = async (req: Request, res: Response, next: NextFunction) => {
-    const { refreshToken } = req.body
+    const { refreshToken } = req.body;
     if (!refreshToken) {
         return res.status(404).json({
-            'error': true,
-            'response': 'Please provide a refresh token'
-        })
+            error: true,
+            response: 'Please provide a refresh token',
+        });
     }
     try {
-        const response = await VerifyRefreshToken(refreshToken)
-        const payload = {_id: response._id as string, email: response.email}
-        const accessToken = jwt.sign(payload, ACCESS_TOKEN_KEY, {expiresIn: '10d'})
+        const response = await VerifyRefreshToken(refreshToken);
+        const payload = { _id: response._id as string, email: response.email };
+        const accessToken = jwt.sign(payload, ACCESS_TOKEN_KEY, { expiresIn: '10d' });
         return res.json({
-            'error': false,
-            'response': accessToken
-        })
-    }
-    catch(e) {
+            error: false,
+            response: accessToken,
+        });
+    } catch (e) {
         return res.status(400).json({
-            'error': true,
-            'response': e
-        })
+            error: true,
+            response: e,
+        });
     }
-}
+};
 
 export const GetCustomerProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const test = await VerifyRefreshToken('1eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWNiMjQ2NWNhZDkwNjY5NDZiZDNiMWMiLCJlbWFpbCI6IjEyMzEyMzExMTEiLCJpYXQiOjE3MDc4MTI1MTN9.RLzB0gC12I2Uhrh8WuMTxLGbq6DTSjllR6B1IX7iL7w')
-        console.log(test)
+        const test = await VerifyRefreshToken(
+            '1eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWNiMjQ2NWNhZDkwNjY5NDZiZDNiMWMiLCJlbWFpbCI6IjEyMzEyMzExMTEiLCJpYXQiOjE3MDc4MTI1MTN9.RLzB0gC12I2Uhrh8WuMTxLGbq6DTSjllR6B1IX7iL7w'
+        );
+        console.log(test);
+    } catch (e) {
+        console.log(e);
     }
-    catch(e) {
-        console.log(e)
-
-    }
-}
+};
 
 export const UpdateCustomerProfile = async (req: Request, res: Response, next: NextFunction) => {
-    const customer = req.customer
+    const customer = req.customer;
     if (!customer) {
-        return res.status(404).json('Can\'t locate the customer')
+        return res.status(404).json("Can't locate the customer");
     }
-    return res.json({customer})
+    return res.json({ customer });
     try {
         // const {}
-    }
-    catch(e) {
-
-    }
-}
+    } catch (e) {}
+};
 
 export const GooglePostLogin = async (req: Request, res: Response, next: NextFunction) => {
-    const { email, firstName, lastName, photoURL, phoneNumber } = req.body
+    const { email, firstName, lastName, photoURL, phoneNumber } = req.body;
 
     if (!email) {
-        return res.status(404).json('Error fetching email address, please try again later')
+        return res.status(404).json('Error fetching email address, please try again later');
     }
 
     try {
         // save/update customer profile
-        const customer = await Customer.findOneAndUpdate({ email: email }, {
-            firstName,
-            lastName,
-            profileImage: photoURL,
-            phone: phoneNumber,
-            socialSignin: 'google'
-        }, { 
-            upsert: true,
-            new: true,
-            setDefaultsOnInsert: true
-        });
+        const customer = await Customer.findOneAndUpdate(
+            { email: email },
+            {
+                firstName,
+                lastName,
+                profileImage: photoURL,
+                phone: phoneNumber,
+                socialSignin: 'google',
+            },
+            {
+                upsert: true,
+                new: true,
+                setDefaultsOnInsert: true,
+            }
+        );
 
         // once profile is saved, issue an app token
         if (customer) {
-            const { accessToken, refreshToken } = await GenerateTokens(customer)
-                return res.json({customer,accessToken,refreshToken})
+            const { accessToken, refreshToken } = await GenerateTokens(customer);
+            return res.json({ customer, accessToken, refreshToken });
+        } else {
+            return res.status(404).json('Error saving customer profile, please try again later');
         }
-        else {
-            return res.status(404).json('Error saving customer profile, please try again later')
-        }
+    } catch (e) {
+        return res.status(400).json('Error saving customer profile, please try again later');
     }
-    catch(e) {
-        return res.status(400).json('Error saving customer profile, please try again later')
-    }
-
-}
+};
