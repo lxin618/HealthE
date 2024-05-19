@@ -87,7 +87,6 @@ export const SendOtp = async (req: Request, res: Response, next: NextFunction) =
                     .json('Something wrong sending the email, please try again later');
             });
     }
-    return res.status(400).json('Please provide a phone number');
 };
 
 // export const Verify = async (req: Request, res: Response, next: NextFunction) => {
