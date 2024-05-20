@@ -133,7 +133,6 @@ export const Login = async (req: Request, res: Response, next: NextFunction) => 
             key = 'email';
         }
         const customer = await Customer.findOne({ [key]: value });
-
         if (!customer) {
             return res
                 .status(404)
