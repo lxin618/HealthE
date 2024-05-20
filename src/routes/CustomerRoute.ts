@@ -1,12 +1,18 @@
-import express, { Request, Response, NextFunction } from "express";
-import { GetCustomerById, GetCustomerProfile, Login, Register, UpdateCustomerProfile } from "../controllers";
-import { Auth } from "../middleware/Auth";
+import express, { Request, Response, NextFunction } from 'express';
+import {
+    GetCustomerById,
+    GetCustomerProfile,
+    Login,
+    Register,
+    CustomerAccountSetup,
+} from '../controllers';
+import { Auth } from '../middleware/Auth';
 
 const router = express.Router();
 
 // router.post('/refreshtoken, TokenRefresh')
-router.get('/profile', GetCustomerProfile)
-router.get('/:id', GetCustomerById)
-router.patch('/profile', Auth, UpdateCustomerProfile)
+router.get('/profile', GetCustomerProfile);
+router.get('/:id', GetCustomerById);
+router.patch('/profile', Auth, CustomerAccountSetup);
 
-export { router as CustomerRoute }
+export { router as CustomerRoute };

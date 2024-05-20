@@ -221,15 +221,48 @@ export const GetCustomerProfile = async (req: Request, res: Response, next: Next
     }
 };
 
-export const UpdateCustomerProfile = async (req: Request, res: Response, next: NextFunction) => {
+export const CustomerAccountSetup = async (req: Request, res: Response, next: NextFunction) => {
     const customer = req.customer;
     if (!customer) {
         return res.status(404).json("Can't locate the customer");
     }
-    return res.json({ customer });
-    try {
-        // const {}
-    } catch (e) {}
+    const profile = await Customer.findById(customer._id);
+    if (profile) {
+        try {
+            const {
+                highCholesterol,
+                diabetes,
+                historicalFamilyDiseases,
+                highBloodPressure,
+                overweight,
+                smoke,
+                alcohol,
+                ethnicity,
+                height,
+                weight,
+                gender,
+            } = req.body;
+            console.log(req.body);
+            profile.highCholesterol = highCholesterol;
+            profile.diabetes = diabetes;
+            profile.chronic = historicalFamilyDiseases;
+            profile.highBloodPressure = highBloodPressure;
+            profile.overweight = overweight;
+            profile.smoker = smoke;
+            profile.alcohol = alcohol;
+            profile.ethnicity = ethnicity;
+            profile.height = height;
+            profile.weight = weight;
+            profile.gender = gender;
+            profile.accountSetUp = true;
+            await profile.save();
+            return res.status(200).json('Profile updated successfully');
+        } catch (e) {
+            return res.status(400).json('Error updating customer profile');
+        }
+    } else {
+        return res.status(404).json('Error locating customer profile');
+    }
 };
 
 export const GooglePostLogin = async (req: Request, res: Response, next: NextFunction) => {
