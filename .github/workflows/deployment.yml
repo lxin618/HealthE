@@ -29,7 +29,7 @@ jobs:
       run: npm install -g yarn
 
     - name: Remove modules && Install dependencies
-      run: rm -rf node_modules && yarn install --frozen-lockfile
+      run: rm -rf node_modules && yarn install --frozen-lockfile --ignore-engines
 
     - name: Build project
       run: npm run build --if-present
