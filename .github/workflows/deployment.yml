@@ -24,9 +24,17 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: rm -rf node_modules && yarn install --frozen-lockfile
-    - run: npm run build --if-present
-    - run: npm test
-    - run: |
+        
+    - name: Setup yarn
+      run: npm install -g yarn
+
+    - name: Remove modules && Install dependencies
+      run: rm -rf node_modules && yarn install --frozen-lockfile
+
+    - name: Build project
+      run: npm run build --if-present
+
+    - name: Copy env var 
+      run: |
         touch .env
         echo "{{ secrets.PROD_ENV_FILE }}" > .env
