@@ -16,3 +16,7 @@ npm run dev
 
 
 ```
+
+### Useful doc:
+non-monolith Nginx folder setup - https://gist.github.com/sanrandry/bd4350a591f62eb259e48cd9fbfcd642
+initial set-up using ssh with ec2 directly - https://github.com/kalyansaxena/nodejs-restapi-ec2
