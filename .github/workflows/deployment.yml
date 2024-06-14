@@ -25,16 +25,19 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         
-    - name: Setup yarn
+    - name: setup yarn
       run: npm install -g yarn
+      
+    - name: tsc compile
+      uses: iCrawl/action-tsc@v1
 
-    - name: Remove modules && Install dependencies
-      run: rm -rf node_modules && yarn install --frozen-lockfile --ignore-engines
+    - name: remove modules && Install dependencies
+      run: rm -rf node_modules && yarn --frozen-lockfile --ignore-engines
 
-    - name: Build project
+    - name: build project
       run: npm run build --if-present
 
-    - name: Copy env var 
+    - name: copy env var 
       run: |
         touch .env
         echo "{{ secrets.PROD_ENV_FILE }}" > .env
