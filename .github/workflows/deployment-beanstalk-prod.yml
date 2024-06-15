@@ -29,6 +29,10 @@ jobs:
           with:
             node-version: ${{ matrix.node-version }}
             cache: yarn
+        - name: Copy env var 
+          run: |
+            touch .env
+            echo "${{ secrets.PROD_ENV_FILE }}" > .env
         - name: Running test...
           run: |
             yarn config set ignore-engines true
@@ -42,10 +46,6 @@ jobs:
         - build-package
         - run-test
       steps:
-        - name: Copy env var 
-          run: |
-            touch .env
-            echo "${{ secrets.PROD_ENV_FILE }}" > .env
         - name: Generate deployment package
           run: zip -r deployment-prod-package.zip .
         - name: Deploy to EB
