@@ -33,6 +33,10 @@ jobs:
           run: |
             touch .env
             echo "${{ secrets.PROD_ENV_FILE }}" > .env
+        - name: Install packages...
+          run: |
+            yarn config set ignore-engines true
+            yarn
         - name: Running server & tests...
           uses: BerniWittmann/background-server-action@v1
           with:
