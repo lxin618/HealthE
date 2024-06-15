@@ -36,8 +36,8 @@ jobs:
         - name: Running server & tests...
           uses: BerniWittmann/background-server-action@v1
           with:
-            command: npm run tests
-            start: npm start
+            command: npm run test
+            start: npm run dev
   deploy-beanstalk:
       runs-on: ubuntu-latest
       needs: 
