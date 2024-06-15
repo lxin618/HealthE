@@ -19,8 +19,8 @@ jobs:
           cache: yarn
       - name: Setup yarn
         run: npm install -g yarn
-      - name: Install packages
-        run: rm -rf node_modules && yarn --ignore-engines
+      - name: Remove packages
+        run: rm -rf node_modules
   run-test:
       runs-on: ubuntu-latest
       steps:
@@ -33,7 +33,7 @@ jobs:
           run: |
             yarn config set ignore-engines true
             yarn
-            npm run start:dev &
+            npm run dev
             sleep 2s
             TZ=Pacific/Auckland yarn test --silent
   deploy-beanstalk:
