@@ -1,0 +1,45 @@
+name: Workflow deployment
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-packages:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: 20
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: setup yarn
+        run: npm install -g yarn
+      - name: install packages
+        run: rm -rf node_modules && yarn --ignore-engines
+      - name: copy env var 
+        run: |
+          touch .env
+          echo "${{ secrets.PROD_ENV_FILE }}" > .env
+      - name: generate deployment package
+        run: zip -r deployment-prod-package.zip .
+  deploy-to-beanstalk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_PROD }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+          application_name: 'healthe-prod'
+          environment_name: 'healthe-prod-env'
+          version_label: ${{ github.sha }}
+          region: ap-southeast-2
+          deployment_package: deployment-prod-package.zip
+    
+      
