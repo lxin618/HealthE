@@ -39,7 +39,7 @@ jobs:
             yarn
             npm run dev
             sleep 2s
-            TZ=Pacific/Auckland yarn test --silent
+            TZ=Pacific/Auckland yarn test
   deploy-beanstalk:
       runs-on: ubuntu-latest
       needs: 
