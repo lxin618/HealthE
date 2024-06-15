@@ -23,6 +23,7 @@ jobs:
         run: rm -rf node_modules && yarn --ignore-engines
   run-test:
       runs-on: ubuntu-latest
+      needs: build-package
       steps:
         - name: Running test...
           run: npm run test
