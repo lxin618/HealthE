@@ -23,15 +23,16 @@ jobs:
         run: rm -rf node_modules && yarn --ignore-engines
   run-test:
       runs-on: ubuntu-latest
-      needs: build-package
       steps:
         - uses: actions/checkout@v4
         - uses: actions/setup-node@v4
           with:
             node-version: ${{ matrix.node-version }}
+            cache: yarn
         - name: Running test...
           run: |
             yarn config set ignore-engines true
+            yarn
             TZ=Pacific/Auckland yarn test --silent
   deploy-beanstalk:
       runs-on: ubuntu-latest
