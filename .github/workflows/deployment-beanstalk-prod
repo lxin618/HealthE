@@ -3,7 +3,6 @@ name: Workflow deployment
 on:
   push:
     branches: [ "main" ]
-
 jobs:
   build-packages:
     runs-on: ubuntu-latest
