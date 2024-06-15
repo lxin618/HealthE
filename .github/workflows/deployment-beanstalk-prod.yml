@@ -33,7 +33,8 @@ jobs:
           run: |
             yarn config set ignore-engines true
             yarn
-            npm run start:dev & && sleep 2s
+            npm run start:dev &
+            sleep 2s
             TZ=Pacific/Auckland yarn test --silent
   deploy-beanstalk:
       runs-on: ubuntu-latest
