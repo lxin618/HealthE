@@ -31,7 +31,7 @@ jobs:
             node-version: ${{ matrix.node-version }}
             cache: 'yarn'
         - name: Running test...
-          run: TZ=Pacific/Auckland yarn test --silent
+          run: TZ=Pacific/Auckland yarn test --silent --ignore-engines
   deploy-beanstalk:
       runs-on: ubuntu-latest
       needs: 
