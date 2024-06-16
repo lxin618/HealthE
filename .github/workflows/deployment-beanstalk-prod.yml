@@ -61,7 +61,6 @@ jobs:
             environment_name: 'healthe-prod-env'
             version_label: ${{ github.sha }}
             region: ap-southeast-2
-            use_existing_version_if_available: true
             deployment_package: deployment-prod-package.zip
     
       
