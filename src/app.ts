@@ -11,6 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/customer', CustomerRoute);
 app.use('/api/auth', AuthRoute);
-app.use('/api/health', GeneralRoute);
+// tell beanstalk the server is running
+app.use('/', GeneralRoute);
 
 export default app;
