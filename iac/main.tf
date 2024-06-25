@@ -1,12 +1,10 @@
 # Create elastic beanstalk application
- 
 resource "aws_elastic_beanstalk_application" "healthe-staging" {
   name = var.elasticapp
 }
  
 # Create elastic beanstalk Environment
- 
-resource "aws_elastic_beanstalk_environment" "healthe-staging-env" {
+resource "aws_elastic_beanstalk_environment" "healthe-sbeanstalkappenvtaging-env" {
   name                = var.beanstalkappenv
   application         = aws_elastic_beanstalk_application.elasticapp.name
   solution_stack_name = var.solution_stack_name
@@ -67,6 +65,26 @@ resource "aws_elastic_beanstalk_environment" "healthe-staging-env" {
     namespace = "aws:elasticbeanstalk:healthreporting:system"
     name      = "SystemType"
     value     = "enhanced"
+  }
+  setting {
+    namespace = "aws:elb:loadbalancer"
+    name      = "SecurityGroups"
+    value     = var.elb_security_group
+  }
+  setting {
+    namespace = "aws:elb:listener:listener_port"
+    name      = "ListenerProtocol"
+    value     = "HTTPS"
+  }
+  setting {
+    namespace = "aws:elb:listener:listener_port"
+    name      = "SSLCertificateId"
+    value     = var.SSLCertificateId
+  }
+  setting {
+    namespace = "aws:elb:listener:listener_port"
+    name      = "InstancePort"
+    value     = "443" # https default port
   }
  
 }
