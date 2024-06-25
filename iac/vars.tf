@@ -14,3 +14,27 @@ variable "tier" {
   type = string
   default = "WebServer"
 }
+variable "vpc_id" {
+  type = string
+}
+variable "public_subnets" {
+    type = list(string)
+}
+variable "Instance_type" {
+  type = string
+}
+variable "minsize" {
+  type = number
+}
+variable "maxsize" {
+  type = number
+}
+variable "elb_public_subnets" {
+  type = list(string)
+}
+variable "elb_security_group" {
+  type = string
+}
+variable "SSLCertificateId" {
+  type = string
+}
