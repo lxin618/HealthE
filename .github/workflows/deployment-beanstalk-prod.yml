@@ -2,8 +2,9 @@ name: Workflow deployment
 
 on:
     push:
-        paths-ignore:
-            - 'iac/**'
+        paths:
+            - '!**.tf'
+            - '!**.tfvars'
         branches: ['main']
 jobs:
     build-test-deploy:
