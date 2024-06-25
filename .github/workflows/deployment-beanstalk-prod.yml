@@ -5,6 +5,8 @@ on:
         paths:
             - '!**.tf'
             - '!**.tfvars'
+            - '!**.tfstate'
+            - '!.md'
         branches: ['main']
 jobs:
     build-test-deploy:
