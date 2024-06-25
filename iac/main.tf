@@ -4,9 +4,9 @@ resource "aws_elastic_beanstalk_application" "healthe-staging" {
 }
  
 # Create elastic beanstalk Environment
-resource "aws_elastic_beanstalk_environment" "healthe-sbeanstalkappenvtaging-env" {
+resource "aws_elastic_beanstalk_environment" "healthe-beanstalkappenv-staging-env" {
   name                = var.beanstalkappenv
-  application         = aws_elastic_beanstalk_application.elasticapp.name
+  application         = aws_elastic_beanstalk_application.healthe-staging.name
   solution_stack_name = var.solution_stack_name
   tier                = var.tier
  
