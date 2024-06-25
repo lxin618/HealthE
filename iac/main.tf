@@ -1,12 +1,12 @@
 # Create elastic beanstalk application
  
-resource "aws_elastic_beanstalk_application" "elasticapp" {
+resource "aws_elastic_beanstalk_application" "healthe-staging" {
   name = var.elasticapp
 }
  
 # Create elastic beanstalk Environment
  
-resource "aws_elastic_beanstalk_environment" "beanstalkappenv" {
+resource "aws_elastic_beanstalk_environment" "healthe-staging-env" {
   name                = var.beanstalkappenv
   application         = aws_elastic_beanstalk_application.elasticapp.name
   solution_stack_name = var.solution_stack_name
@@ -46,7 +46,7 @@ resource "aws_elastic_beanstalk_environment" "beanstalkappenv" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "InstanceType"
-    value     = "t2.medium"
+    value     = var.Instance_type
   }
   setting {
     namespace = "aws:ec2:vpc"
@@ -56,12 +56,12 @@ resource "aws_elastic_beanstalk_environment" "beanstalkappenv" {
   setting {
     namespace = "aws:autoscaling:asg"
     name      = "MinSize"
-    value     = 1
+    value     = var.minsize
   }
   setting {
     namespace = "aws:autoscaling:asg"
     name      = "MaxSize"
-    value     = 2
+    value     = var.maxsize
   }
   setting {
     namespace = "aws:elasticbeanstalk:healthreporting:system"
