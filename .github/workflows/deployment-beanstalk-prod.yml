@@ -1,51 +1,51 @@
 name: Workflow deployment
 
 on:
-  push:
-    branches: [ "main" ]
+    push:
+        paths-ignore:
+            - 'iac/**'
+        branches: ['main']
 jobs:
-  build-test-deploy:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20]
-    steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: yarn
-      - name: Setup yarn
-        run: npm install -g yarn
-      - name: Remove packages
-        run: rm -rf node_modules
-      - name: Copy env var 
-        run: |
-          touch .env
-          echo "${{ secrets.PROD_ENV_FILE }}" > .env
-      - name: Install packages...
-        run: |
-          yarn config set ignore-engines true
-          yarn
-      - name: Running server & tests...
-        uses: BerniWittmann/background-server-action@v1
-        with:
-          command: npm run test
-          start: npm run dev
-      - name: Generate deployment package
-        run: zip -r deployment-prod-package.zip .
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_PROD }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
-          application_name: 'healthe-prod'
-          environment_name: 'healthe-prod-env'
-          version_label: ${{ github.sha }}
-          region: ap-southeast-2
-          use_existing_version_if_available: true
-          deployment_package: deployment-prod-package.zip
-    
-      
+    build-test-deploy:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [20]
+        steps:
+            - name: Checkout Source
+              uses: actions/checkout@v4
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: yarn
+            - name: Setup yarn
+              run: npm install -g yarn
+            - name: Remove packages
+              run: rm -rf node_modules
+            - name: Copy env var
+              run: |
+                  touch .env
+                  echo "${{ secrets.PROD_ENV_FILE }}" > .env
+            - name: Install packages...
+              run: |
+                  yarn config set ignore-engines true
+                  yarn
+            - name: Running server & tests...
+              uses: BerniWittmann/background-server-action@v1
+              with:
+                  command: npm run test
+                  start: npm run dev
+            - name: Generate deployment package
+              run: zip -r deployment-prod-package.zip .
+            - name: Deploy to EB
+              uses: einaregilsson/beanstalk-deploy@v22
+              with:
+                  aws_access_key: ${{ secrets.AWS_ACCESS_KEY_PROD }}
+                  aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+                  application_name: 'healthe-prod'
+                  environment_name: 'healthe-prod-env'
+                  version_label: ${{ github.sha }}
+                  region: ap-southeast-2
+                  use_existing_version_if_available: true
+                  deployment_package: deployment-prod-package.zip
