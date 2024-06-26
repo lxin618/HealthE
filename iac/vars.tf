@@ -25,12 +25,11 @@ variable "Instance_type" {
 }
 variable "minsize" {
   type = number
+  default = 1
 }
 variable "maxsize" {
   type = number
-}
-variable "elb_public_subnets" {
-  type = list(string)
+  default = 1
 }
 variable "elb_security_group" {
   type = string
