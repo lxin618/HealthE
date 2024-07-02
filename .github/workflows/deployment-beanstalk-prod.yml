@@ -7,7 +7,10 @@ on:
             - '!**.tfvars'
             - '!**.tfstate'
             - '!.md'
-        branches: ['main']
+        release:
+            types: [published]
+        tags:
+            - 'v*'
 jobs:
     build-test-deploy:
         runs-on: ubuntu-latest
