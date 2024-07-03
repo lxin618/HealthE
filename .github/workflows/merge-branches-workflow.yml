@@ -10,7 +10,9 @@ on:
             - '.github/**'
             - '!.github/workflows/deployment.yml'
             - '!.github/workflows/scheduled-tests.yml'
-        branches: ['main']
+        pull_request:
+            types: [opened, reopened]
+
 jobs:
     install-packages:
         runs-on: ubuntu-latest
