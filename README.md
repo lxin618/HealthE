@@ -18,7 +18,7 @@ npm run dev
 
 ### Repo info
 
-Repo is setup with github action which pushed to AWS elastic beanstalk on merge. (Update to terrafrom files will not trigger wrokflow)
+Repo is setup with github action which pushed to AWS elastic beanstalk on releasing a new version. (Update to terrafrom files will not trigger wrokflow)
 Instead, update to terraform files in `/iac` folder will trigger terraform plan and apply automactially which will be deployed to AWS beanstalk
 
 ### Useful doc:
