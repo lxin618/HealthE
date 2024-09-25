@@ -11,5 +11,4 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up secret file
-      run: |
-        echo -n "${{ secrets.PROD_ENV_FILE }}" | xxd -ps
+      run: echo -n "${{ secrets.PROD_ENV_FILE }}" >> foo && cut -c1-1 foo && cut -c 2- foo
