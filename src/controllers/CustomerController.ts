@@ -209,15 +209,15 @@ export const TokenRefresh = async (req: Request, res: Response) => {
     }
 };
 
-export const GetCustomerProfile = async (req: Request, res: Response) => {
-    try {
-        const test = await VerifyRefreshToken(
-            '1eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWNiMjQ2NWNhZDkwNjY5NDZiZDNiMWMiLCJlbWFpbCI6IjEyMzEyMzExMTEiLCJpYXQiOjE3MDc4MTI1MTN9.RLzB0gC12I2Uhrh8WuMTxLGbq6DTSjllR6B1IX7iL7w'
-        );
-        console.log(test, '123');
-    } catch (e) {
-        console.log(e);
-    }
+export const GetCustomerProfile = async () => {
+    // try {
+    //     const test = await VerifyRefreshToken(
+    //         '1eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWNiMjQ2NWNhZDkwNjY5NDZiZDNiMWMiLCJlbWFpbCI6IjEyMzEyMzExMTEiLCJpYXQiOjE3MDc4MTI1MTN9.RLzB0gC12I2Uhrh8WuMTxLGbq6DTSjllR6B1IX7iL7w'
+    //     );
+    //     console.log(test, '123');
+    // } catch (e) {
+    //     console.log(e);
+    // }
 };
 
 export const CustomerAccountSetup = async (req: Request, res: Response) => {
