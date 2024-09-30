@@ -1,11 +1,5 @@
-import express, { Request, Response, NextFunction } from 'express';
-import {
-    GetCustomerById,
-    GetCustomerProfile,
-    Login,
-    Register,
-    CustomerAccountSetup,
-} from '../controllers';
+import express from 'express';
+import { GetCustomerById, GetCustomerProfile, CustomerAccountSetup } from '../controllers';
 import { Auth } from '../middleware/Auth';
 
 const router = express.Router();

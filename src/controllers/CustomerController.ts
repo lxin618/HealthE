@@ -1,15 +1,15 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { Customer } from '../models';
 import { ValidatePassowrd } from '../utility';
 import { SignupValidation, LoginValidation } from '../utility/FieldValidationUtility';
 import { GenerateTokens, VerifyRefreshToken } from '../utility/TokenUtility';
 import jwt from 'jsonwebtoken';
 import { CustomerToken } from '../models/CustomerTokenModel';
-import { GenerateOtp, onRequestOtp } from '../utility/NotificationUtility';
+import { GenerateOtp } from '../utility/NotificationUtility';
 import { ACCESS_TOKEN_KEY, SENDGRID_API_KEY, EMAIL_OTP_TEMPLATE_ID } from '../config';
 import { MailService } from '@sendgrid/mail';
 
-export const Register = async (req: Request, res: Response, next: NextFunction) => {
+export const Register = async (req: Request, res: Response) => {
     const { error } = SignupValidation(req);
     if (error) {
         return res.status(400).json(error.details[0].message);
@@ -20,8 +20,8 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
         return res.status(400).json('Email address already existed');
     }
     try {
-        let dateParts = birthday.split('/');
-        let dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+        const dateParts = birthday.split('/');
+        const dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
         const customer = await Customer.create({
             firstName: firstName,
             lastName: lastName,
@@ -38,7 +38,7 @@ export const Register = async (req: Request, res: Response, next: NextFunction) 
     }
 };
 
-export const SendOtp = async (req: Request, res: Response, next: NextFunction) => {
+export const SendOtp = async (req: Request, res: Response) => {
     const { value, type } = req.body;
     if (type == 'phone') {
         const { otp, expiry } = GenerateOtp();
@@ -81,7 +81,7 @@ export const SendOtp = async (req: Request, res: Response, next: NextFunction) =
                     expiry,
                 });
             })
-            .catch((error) => {
+            .catch(() => {
                 return res
                     .status(500)
                     .json('Something wrong sending the email, please try again later');
@@ -89,7 +89,7 @@ export const SendOtp = async (req: Request, res: Response, next: NextFunction) =
     }
 };
 
-// export const Verify = async (req: Request, res: Response, next: NextFunction) => {
+// export const Verify = async (req: Request, res: Response) => {
 //     const {otp} = req.body
 //     const customer = req.customer
 //     if (customer) {
@@ -111,13 +111,13 @@ export const SendOtp = async (req: Request, res: Response, next: NextFunction) =
 //     })
 // }
 
-export const Logout = async (req: Request, res: Response, next: NextFunction) => {
+export const Logout = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
     await CustomerToken.findOneAndDelete({ token: refreshToken });
     return res.json('User logged out sccessfully');
 };
 
-export const Login = async (req: Request, res: Response, next: NextFunction) => {
+export const Login = async (req: Request, res: Response) => {
     const { error } = LoginValidation(req);
 
     if (error) {
@@ -163,7 +163,7 @@ export const Login = async (req: Request, res: Response, next: NextFunction) => 
     }
 };
 
-export const GetCustomerById = async (req: Request, res: Response, next: NextFunction) => {
+export const GetCustomerById = async (req: Request, res: Response) => {
     const customerId = req.params.id;
     if (!customerId) {
         return res.status(400).json({
@@ -185,7 +185,7 @@ export const GetCustomerById = async (req: Request, res: Response, next: NextFun
     }
 };
 
-export const TokenRefresh = async (req: Request, res: Response, next: NextFunction) => {
+export const TokenRefresh = async (req: Request, res: Response) => {
     const { refreshToken } = req.body;
     if (!refreshToken) {
         return res.status(404).json({
@@ -209,18 +209,9 @@ export const TokenRefresh = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
-export const GetCustomerProfile = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const test = await VerifyRefreshToken(
-            '1eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWNiMjQ2NWNhZDkwNjY5NDZiZDNiMWMiLCJlbWFpbCI6IjEyMzEyMzExMTEiLCJpYXQiOjE3MDc4MTI1MTN9.RLzB0gC12I2Uhrh8WuMTxLGbq6DTSjllR6B1IX7iL7w'
-        );
-        console.log(test, '123');
-    } catch (e) {
-        console.log(e);
-    }
-};
+export const GetCustomerProfile = async () => {};
 
-export const CustomerAccountSetup = async (req: Request, res: Response, next: NextFunction) => {
+export const CustomerAccountSetup = async (req: Request, res: Response) => {
     const customer = req.customer;
     if (!customer) {
         return res.status(404).json("Can't locate the customer");
@@ -264,7 +255,7 @@ export const CustomerAccountSetup = async (req: Request, res: Response, next: Ne
     }
 };
 
-export const GooglePostLogin = async (req: Request, res: Response, next: NextFunction) => {
+export const GooglePostLogin = async (req: Request, res: Response) => {
     const { email, firstName, lastName, photoURL, phoneNumber } = req.body;
 
     if (!email) {
