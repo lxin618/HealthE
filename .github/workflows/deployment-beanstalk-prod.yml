@@ -52,8 +52,8 @@ jobs:
               with:
                   aws_access_key: ${{ secrets.AWS_ACCESS_KEY_PROD }}
                   aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
-                  application_name: 'healthe-prod'
-                  environment_name: 'healthe-prod-env'
+                  application_name: 'HealthE'
+                  environment_name: 'HealthE-env-pord'
                   version_label: ${{ github.sha }}
                   region: ap-southeast-2
                   use_existing_version_if_available: true
